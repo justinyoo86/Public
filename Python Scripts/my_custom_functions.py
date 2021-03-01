@@ -2,8 +2,10 @@
 # This script contains all of the custom functions I have written or collected
 # from the internet.
 
+import os
+import PyPDF2
+from PIL import Image
 import shutil
-import errno
 from xml.etree.ElementTree import parse
 
 def copy(source_folder, destination_folder):
@@ -86,4 +88,39 @@ def list_sequence_generator(counting_list):
         for second_counter in range(0,counting_list[first_counter]):
             output_list.append(second_counter + 1)
     return output_list
+
+def delete_photos_output_file_path(output_file_path, delete_photo_list):
+    # This function will delete the photos inside the output_file_path folder,
+    # based on the photo file name within delete_photo_list.
+    for i in range(0,len(delete_photo_list)):
+        os.remove(output_file_path + delete_photo_list[i])
+
+def resize_photos_save_as_pdf(photo_list, input_file_path, photo_dimension_reduction_factor, output_file_path):
+    # This function will resize photos in photo_list in input_file_path.  
+    # Each dimension is reduced by 1/photo_dimension_reduction_factor.  
+    # If photo_dimension_reduction_factor = 2 then height and width are 
+    # reduced by 1/2 each, so the resized photo will be 1/4 size of original.
+    # Resized photos are saved in output_file_path as a PDF.
+    for i in range(0,len(photo_list)):
+        Image1 = Image.open(input_file_path + photo_list[i])
+        
+        Image_Width = Image1.size[0]
+        Image_Height = Image1.size[1]
+        
+        New_Image_Width = int(Image_Width // photo_dimension_reduction_factor)
+        New_Image_Height = int(Image_Height // photo_dimension_reduction_factor)
+         
+        Image1 = Image1.resize((New_Image_Width, New_Image_Height))
+        Image1.save(output_file_path + photo_list[i] + '.pdf')
+        print('Resizing is complete for photo ' + str(photo_list[i]))
+
+def merge_pdfs(pdf_file_list, output_file_path, output_file_name, pdf_output_file_path):
+    # This function will combine PDF files within pdf_file_list in the folder
+    # output_file_path into a single pdf file output_file_name in the folder
+    # pdf_output_file_path.
+    pdf_merger = PyPDF2.PdfFileMerger()
+    for i in range(0,len(pdf_file_list)):
+        pdf_merger.append(PyPDF2.PdfFileReader(output_file_path + pdf_file_list[i], 'rb'))
+    pdf_merger.write(pdf_output_file_path + output_file_name)
+    pdf_merger.close()
 
