@@ -1,61 +1,89 @@
+# Author: Justin Yoo
+# This script contains all of the custom functions I have written or collected
+# from the internet.
+
 import shutil
 import errno
 from xml.etree.ElementTree import parse
 
-
-def copyDirectory(src,dest):
+def copy(source_folder, destination_folder):
+    # Copy a source_folder to a destination_folder.
     try:
-        shutil.copytree(src, dest)
-    #Directories are the same
+        shutil.copytree(source_folder, destination_folder)
+    # Error if the directories are the same.
     except shutil.Error as e:
-        print('Directory not copied. Error: %s' % e)
-    #Any error saying that the directory doesn't exist
+        print('Directory not copied. Error: %s' %e)
+    # Any error saying that the source directory doesn't exist.
     except OSError as e:
         print('Directory not copied. Error: %s' %e)
 
-def copy(src,dest):
-    try:
-        shutil.copytree(src, dest)
-    #Any error saying that the directory doesn't exist
-    except OSError as e:
-        if e.errno == errno.ENOTDIR:
-            shutil.copy(src,dest)
-        else:
-            print('Directory not copied. Error: %s' %e)
+def left(string, amount):
+    # Trim a string down to 'amount' of characters, counting from the left.
+    return string[:amount]
 
+def right(string, amount):
+    # Trim a string down to 'amount' of characters, counting from the right.
+    return string[-amount:]
 
-def left(s, amount):
-    return s[:amount]
+def mid(string, starting_offset, amount):
+    # Trim a string down to 'amount' of characters, counting from left and 
+    # starting from starting_offset to 'amount' of characters.
+    return string[starting_offset:starting_offset + amount]
 
-def right(s, amount):
-    return s[-amount:]
-
-def mid(s, offset, amount):
-    return s[offset:offset+amount]
-
-def List_Sequence_Generator(Input_List):
-    Output_List = list()
-    for First_Counter in range(0,len(Input_List)):
-        for Second_Counter in range(0,Input_List[First_Counter]):
-            Output_List.append(Second_Counter + 1)
-    return Output_List
-
-def XML_Sub_Element_Array_Maker(Top_Element, Sub_Element, XML_Data_File):
-    Root = parse(XML_Data_File).getroot()
-    Top_Element_Count = 0
-    Sub_Element_Count = 0
-    Sub_Element_List = []
-    for i in Root.iter(Top_Element):
-        if i.tag == Top_Element:
-            Top_Element_Count = Top_Element_Count + 1
-            Elements_List = list(i.iter())
-            Sub_Element_Count = 0
-            for j in range(0,len(Elements_List)):
-                if Elements_List[j].tag == Sub_Element:
-                   Sub_Element_Count = Sub_Element_Count + 1
-            Sub_Element_List.append(Sub_Element_Count)
-            
-    print(Sub_Element_List)
-    return(Sub_Element_List)
+def xml_sub_element_array_maker(top_element_name, sub_element_name, xml_file):
+    # This function parses FastField survey XML files for forms that 
+    # comprise of subforms with multi-photo field form questions.
+    # top_element_name is the Excel file tab name of a # standard piece of 
+    # equipment (e.g. HVAC_Subform).  
+    # sub_element_name is another Excel file tab name of the FastField 
+    # multi-photo field (e.g. HVAC_Photos).  
+    # xml_file is the FastField survey XML output file.
+    # This function iterates through an xml_file looking for elements named
+    # top_element_name.  Once a top_element_name is found, then it counts how 
+    # many sub_element_names are within that top_element_name in the xml tree.  
+    # Then it moves to search for the next top_element_name in the xml_file.  
+    # The resulting counting_list is a list where each number represents the 
+    # number of sub_element_names for each top_element_name, in sequence.
+    # ========================================================================
+    # Example top_element_name = HVAC_Subform, 
+    # sub_element_name = HVAC_Photos, and counting_list = [2, 5, 3]
+    # This means HVAC_Subform has two occurrences of HVAC_Photos in first
+    # HVAC_Subform XML element, five occurrences of HVAC_Photos in second 
+    # HVAC_Subform XML element, and three occurrences of HVAC_Photos in third
+    # HVAC_Subform XML element.  This is useful for matching equipment to 
+    # the FastField multi-photo field.
+    root = parse(xml_file).getroot()
+    top_element_count = 0
+    sub_element_count = 0
+    counting_list = []
+    for i in root.iter(top_element_name):
+        if i.tag == top_element_name:
+            top_element_count = top_element_count + 1
+            elements_list = list(i.iter())
+            sub_element_count = 0
+            for j in range(0,len(elements_list)):
+                if elements_list[j].tag == sub_element_name:
+                   sub_element_count = sub_element_count + 1
+            counting_list.append(sub_element_count)
     
+    return(counting_list)
+
+def list_sequence_generator(counting_list):
+    # This function serves to further enhance the function 
+    # xml_sub_element_array_maker for FastField survey files with subforms
+    # comprising multi-photo fields.
+    # This function takes in counting_list and creates a numerical sequence
+    # from one to the value of the item in the list.
+    # Example counting_list = [2, 5, 3] then 
+    # output_list = [1, 2, 1, 2, 3, 4, 5, 1, 2, 3]
+    # This functions is useful for matching equipment multi-photo entries to 
+    # a sequential number so that the photos can be renamed properly.
+    # The eventual goal is to combine this with xml_sub_element_array_maker
+    # function, when time permits.  This would have to change all of the 
+    # code I've currently written.
+    output_list = list()
+    for first_counter in range(0,len(counting_list)):
+        for second_counter in range(0,counting_list[first_counter]):
+            output_list.append(second_counter + 1)
+    return output_list
 
