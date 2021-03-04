@@ -13,7 +13,7 @@ input_file_path = 'C:/Users/' + user_name + '/Pictures/B 1 - Rotate/'
 output_file_path = 'C:/Users/' + user_name + '/Pictures/B 2 - Rotated Photos/'
 
 photo_list = os.listdir(input_file_path)
-photo_rotation_angle = 90
+photo_rotation_angle = 270
 photo_list_delete = os.listdir(output_file_path)
 
 # For any existing photos in output_file_path, delete them.
