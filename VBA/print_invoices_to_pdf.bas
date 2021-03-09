@@ -1,6 +1,7 @@
 Attribute VB_Name = "print_invoices_to_pdf"
 Sub print_invoice_to_pdf()
 
+' Author: Justin Yoo
 ' This VBA module will print a specific Excel tab to a PDF.  The print areas of the tab can be set in the Excel file.
 ' Multiple tabs and PDFs can be printed by copying the code and setting up new pdf file names.
 
