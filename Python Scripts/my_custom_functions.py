@@ -124,3 +124,9 @@ def merge_pdfs(pdf_file_list, output_file_path, output_file_name, pdf_output_fil
     pdf_merger.write(pdf_output_file_path + output_file_name)
     pdf_merger.close()
 
+def lookup_site_number(data_frame, submission_id_site_dictionary):
+    # This function will return a data frame that has the site number within
+    # the submission_id_site_dictionary from FastField.
+    for i in range(0,len(data_frame)):
+        data_frame.at[i,'Submission Id'] = submission_id_site_dictionary[data_frame.iloc[i,0]]
+    return data_frame
