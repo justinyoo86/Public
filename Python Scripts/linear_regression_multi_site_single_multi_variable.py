@@ -20,7 +20,7 @@ model_results_df = pd.DataFrame(columns = ['Store', 'Coefficient 1', 'Coefficien
 x_variable_count = 'single' # single or multi
 x_variable = 'cdd' # cdd or hdd.  If x_variable_count = multi, then ignore
 
-for i in range(1,input_csv_file_df['Site ID'].max() + 1):
+for i in range(1, input_csv_file_df['Site ID'].max() + 1):
     # Select the rows from input_csv_file_df based on the index number 
     # and put the data values into site_data_df
     site_data_df = input_csv_file_df[input_csv_file_df['Site ID'] == i]
